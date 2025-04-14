@@ -1,3 +1,12 @@
+/*
+INNER JOIN
+OUTER JOIN (LEFT JOIN, RIGHT JOIN, FULL OUTER JOIN)
+CROSS JOIN
+Subqueries
+UNION and UNION ALL
+CTE – Common Table Expression (WITH)
+*/
+
 -- INNER JOIN
 SELECT *
 FROM salespeople
@@ -87,3 +96,45 @@ FROM sales s
          INNER JOIN products p ON p.product_id = s.product_id
 WHERE p.product_type = 'automobile'
   AND c.phone IS NOT NULL;
+
+-- Subqueries
+SELECT *
+FROM salespeople
+         INNER JOIN (SELECT * FROM dealerships WHERE dealerships.state = 'CA') d
+                    ON d.dealership_id = salespeople.dealership_id
+ORDER BY 1;
+
+SELECT *
+FROM salespeople
+WHERE dealership_id IN (SELECT dealership_id FROM dealerships WHERE dealerships.state = 'CA')
+ORDER BY 1;
+
+-- UNION / UNION ALL
+(SELECT street_address, city, state, postal_code FROM customers WHERE street_address IS NOT NULL)
+UNION
+(SELECT street_address, city, state, postal_code FROM dealerships)
+ORDER BY 1;
+
+(SELECT first_name,
+        last_name,
+        'Customer' as guest_type
+ FROM customers
+ WHERE city = 'Los Angeles'
+   AND state = 'CA')
+UNION
+(SELECT first_name,
+        last_name,
+        'Employee' as guest_type
+ FROM salespeople s
+          INNER JOIN dealerships d ON d.dealership_id = s.dealership_id
+ WHERE d.city = 'Los Angeles'
+   AND d.state = 'CA');
+
+-- CTE – Common Table Expression (WITH)
+WITH d AS (SELECT *
+           FROM dealerships
+           WHERE dealerships.state = 'CA')
+SELECT *
+FROM salespeople
+         INNER JOIN d ON d.dealership_id = salespeople.salesperson_id
+ORDER BY 1;
